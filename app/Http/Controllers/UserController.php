@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
+use App\Http\Resources\UserResource;
+use App\Http\Helpers\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -17,6 +19,9 @@ class UserController extends Controller
                 'email' => 'required|email|unique:users',
                 'password' => 'required|min:6',
                 'team_id' => 'nullable|exists:teams,id',
+                'phone_num' => 'nullable|string|max:15',
+                'emergency_phone_num' => 'nullable|string|max:15',
+                'address' => 'nullable|string',
                 'roles' => 'required', 
                 'roles.*' => 'exists:roles,id',
                 'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -25,12 +30,16 @@ class UserController extends Controller
             // dd('Validation Passed', $validatedData);
 
             } catch (\Illuminate\Validation\ValidationException $e) {
-                return response()->json(['errors' => $e->errors()], 422);
+                return ApiResponse::error('Validation failed', $e->errors(), 422);
             }
 
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
+                'address' => $request->address,
+                'phone_num' => $request->phone_num,
+                'emergency_phone_num' => $request->emergency_phone_num,
+                'pm_id' => $request->pm_id,
                 'password' => Hash::make($request->password),
                 'team_id' => $request->team_id,
             ]);
@@ -46,10 +55,6 @@ class UserController extends Controller
 
             $user->roles()->attach($request->roles);
 
-            return response()->json([
-                'message' => 'User created successfully',
-                'user' => $user->load('roles'),
-                'profile_pic_url' => $user->profile_pic ? asset('storage/profile_pics/' . $user->profile_pic) : null
-            ], 201);
+            return ApiResponse::success('User created successfully', new UserResource($user), 201);
     }
 }

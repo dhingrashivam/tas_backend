@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('profile_pic')->nullable()->after('email');
+            $table->string('address')->nullable()->after('profile_pic');
+            $table->string('phone_num')->nullable()->after('address');
+            $table->string('emergency_phone_num')->nullable()->after('phone_num');
+            $table->integer('pm_id')->nullable()->after('emergency_phone_num');
             $table->unsignedBigInteger('team_id')->nullable()->after('name');
             $table->foreign('team_id')->references('id')->on('teams')->onDelete('SET NULL');
         });
