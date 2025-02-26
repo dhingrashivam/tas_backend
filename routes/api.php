@@ -22,4 +22,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::apiResource('/teams', TeamController::class);
 
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
 });
