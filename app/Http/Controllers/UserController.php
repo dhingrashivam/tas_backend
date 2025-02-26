@@ -57,4 +57,73 @@ class UserController extends Controller
 
             return ApiResponse::success('User created successfully', new UserResource($user), 201);
     }
+
+    public function index()
+    {
+        $users = User::with(['team', 'roles'])->get();
+        return ApiResponse::success('Users fetched successfully', UserResource::collection($users));
+    }
+
+    public function show($id)
+    {
+        $user = User::with(['team', 'roles'])->find($id);
+
+        if (!$user) {
+            return ApiResponse::error('User not found', [], 404);
+        }
+
+        return ApiResponse::success('User details fetched successfully', new UserResource($user));
+    }
+
+    public function destroy($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return ApiResponse::error('User not found', [], 404);
+        }
+
+        $user->delete();
+        return ApiResponse::success('User deleted successfully');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return ApiResponse::error('User not found', [], 404);
+        }
+
+        try {
+            $validatedData = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'email' => 'sometimes|email|unique:users,email,' . $id,
+                'phone' => 'nullable|string|max:15',
+                'address' => 'nullable|string',
+                'team_id' => 'nullable|exists:teams,id',
+                'roles' => 'nullable|array',
+                'roles.*' => 'exists:roles,id',
+                'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return ApiResponse::error('Validation Error', $e->errors(), 422);
+        }
+
+        $user->update($request->only(['name', 'email', 'phone', 'address', 'team_id']));
+
+        if ($request->hasFile('profile_pic')) {
+            $file = $request->file('profile_pic');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/profile_pics', $filename);
+            $user->profile_pic = $filename;
+        }
+
+        if ($request->has('roles')) {
+            $user->roles()->sync($request->roles);
+        }
+
+        return ApiResponse::success('User updated successfully', new UserResource($user));
+    }
+
 }
