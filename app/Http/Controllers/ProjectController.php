@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Http\Helpers\ApiResponse;
+use App\Http\Resources\ProjectResource;
 
 class ProjectController extends Controller
 {
     public function index()
     {
-        return ApiResponse::success('Projects fetched successfully', Project::with('client', 'salesTeam')->get());
+        return ApiResponse::success('Projects fetched successfully', ProjectResource::collection(Project::with('client', 'salesTeam')->get()));
     }
 
     public function store(Request $request)
@@ -47,7 +48,7 @@ class ProjectController extends Controller
 
         $project->update($validatedData);
 
-        return ApiResponse::success('Project updated successfully', $project);
+        return ApiResponse::success('Project updated successfully', new ProjectResource($project));
     }
 
     public function destroy($id)

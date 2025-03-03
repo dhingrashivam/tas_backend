@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Http\Helpers\ApiResponse;
+use App\Http\Resources\ClientResource;
 
 class ClientController extends Controller
 {
     public function index()
     {
-        return ApiResponse::success('Clients fetched successfully', Client::all());
+        return ApiResponse::success('Clients fetched successfully', ClientResource::collection(Client::all()));
     }
 
     public function store(Request $request)
@@ -41,7 +42,7 @@ class ClientController extends Controller
 
         $client->update($validatedData);
 
-        return ApiResponse::success('Client updated successfully', $client);
+        return ApiResponse::success('Client updated successfully', new ClientResource($client));
     }
 
     public function destroy($id)
