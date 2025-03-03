@@ -22,8 +22,8 @@ class UserController extends Controller
                 'phone_num' => 'nullable|string|max:15',
                 'emergency_phone_num' => 'nullable|string|max:15',
                 'address' => 'nullable|string',
-                'roles' => 'required', 
-                'roles.*' => 'exists:roles,id',
+                'role_id' => 'required', 
+                'role_id.*' => 'exists:roles,id',
                 'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
@@ -40,6 +40,7 @@ class UserController extends Controller
                 'phone_num' => $request->phone_num,
                 'emergency_phone_num' => $request->emergency_phone_num,
                 'pm_id' => $request->pm_id,
+                'role_id' => $request->role_id,
                 'password' => Hash::make($request->password),
                 'team_id' => $request->team_id,
             ]);
@@ -103,15 +104,15 @@ class UserController extends Controller
                 'emergency_phone_num' => 'nullable|string|max:15',
                 'address' => 'nullable|string',
                 'team_id' => 'nullable|exists:teams,id',
-                'roles' => 'nullable|array',
-                'roles.*' => 'exists:roles,id',
+                'role_id' => 'nullable|array',
+                'role_id.*' => 'exists:roles,id',
                 'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return ApiResponse::error('Validation Error', $e->errors(), 422);
         }
 
-        $user->update($request->only(['name', 'email', 'phone', 'address', 'team_id','pm_id','emergency_phone_num']));
+        $user->update($request->only(['name', 'email','role_id', 'phone', 'address', 'team_id','pm_id','emergency_phone_num']));
 
         if ($request->hasFile('profile_pic')) {
             $file = $request->file('profile_pic');
