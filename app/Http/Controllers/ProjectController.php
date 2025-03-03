@@ -27,4 +27,39 @@ class ProjectController extends Controller
         $project = Project::create($validatedData);
         return ApiResponse::success('Project created successfully', $project, 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        $project = Project::find($id);
+
+        if (!$project) {
+            return ApiResponse::error('Project not found', [], 404);
+        }
+
+        $validatedData = $request->validate([
+            'sales_team_id' => 'required|exists:teams,id',
+            'client_id' => 'required|exists:clients,id',
+            'project_name' => 'required|string|max:255',
+            'requirements' => 'nullable|string',
+            'budget' => 'nullable|numeric',
+            'deadline' => 'nullable|date'
+        ]);
+
+        $project->update($validatedData);
+
+        return ApiResponse::success('Project updated successfully', $project);
+    }
+
+    public function destroy($id)
+    {
+        $project = Project::find($id);
+
+        if (!$project) {
+            return ApiResponse::error('Project not found', [], 404);
+        }
+
+        $project->delete();
+        return ApiResponse::success('Project deleted successfully');
+    }
+
 }

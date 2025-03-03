@@ -24,4 +24,36 @@ class ClientController extends Controller
         $client = Client::create($validatedData);
         return ApiResponse::success('Client created successfully', $client, 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        $client = Client::find($id);
+
+        if (!$client) {
+            return ApiResponse::error('Client not found', [], 404);
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'upwork_id' => 'nullable|string|unique:clients,upwork_id,' . $id,
+            'contact_detail' => 'nullable|string'
+        ]);
+
+        $client->update($validatedData);
+
+        return ApiResponse::success('Client updated successfully', $client);
+    }
+
+    public function destroy($id)
+    {
+        $client = Client::find($id);
+
+        if (!$client) {
+            return ApiResponse::error('Client not found', [], 404);
+        }
+
+        $client->delete();
+        return ApiResponse::success('Client deleted successfully');
+    }
+
 }
