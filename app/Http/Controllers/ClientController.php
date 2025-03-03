@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Client;
+use App\Http\Helpers\ApiResponse;
+
+class ClientController extends Controller
+{
+    public function index()
+    {
+        return ApiResponse::success('Clients fetched successfully', Client::all());
+    }
+
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'upwork_id' => 'nullable|string|unique:clients',
+            'contact_detail' => 'nullable|string'
+        ]);
+
+        $client = Client::create($validatedData);
+        return ApiResponse::success('Client created successfully', $client, 201);
+    }
+}

@@ -6,6 +6,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProjectController;
 
 
 // Route::get('/user', function (Request $request) {
@@ -26,5 +28,13 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Projects API
+    Route::get('/clients', [ClientController::class, 'index']);
+    Route::post('/clients', [ClientController::class, 'store']);
+
+    // Projects API
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::post('/projects', [ProjectController::class, 'store']);
 
 });
