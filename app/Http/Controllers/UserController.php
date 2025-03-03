@@ -39,7 +39,6 @@ class UserController extends Controller
                 'address' => $request->address,
                 'phone_num' => $request->phone_num,
                 'emergency_phone_num' => $request->emergency_phone_num,
-                'pm_id' => $request->pm_id,
                 'role_id' => $request->role_id,
                 'password' => Hash::make($request->password),
                 'team_id' => $request->team_id,
