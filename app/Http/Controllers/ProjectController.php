@@ -38,7 +38,6 @@ class ProjectController extends Controller
         }
 
         $validatedData = $request->validate([
-            'sales_team_id' => 'required',
             'client_id' => 'required|exists:clients,id',
             'project_name' => 'required|string|max:255',
             'requirements' => 'nullable|string',
