@@ -53,20 +53,20 @@ class UserController extends Controller
                 $user->save();
             }
 
-            $user->roles()->attach($request->roles);
+            $user->role()->attach($request->roles);
 
             return ApiResponse::success('User created successfully', new UserResource($user), 201);
     }
 
     public function index()
     {
-        $users = User::with(['team', 'roles'])->get();
+        $users = User::with(['team', 'role'])->get();
         return ApiResponse::success('Users fetched successfully', UserResource::collection($users));
     }
 
     public function show($id)
     {
-        $user = User::with(['team', 'roles'])->find($id);
+        $user = User::with(['team', 'role'])->find($id);
 
         if (!$user) {
             return ApiResponse::error('User not found', [], 404);
@@ -121,7 +121,7 @@ class UserController extends Controller
         }
 
         if ($request->has('roles')) {
-            $user->roles()->sync($request->roles);
+            $user->role()->sync($request->roles);
         }
 
         return ApiResponse::success('User updated successfully', new UserResource($user));
