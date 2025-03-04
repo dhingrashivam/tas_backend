@@ -13,10 +13,6 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'project_name' => $this->project_name,
             'client' => new ClientResource($this->client),
-            'sales_team' => [
-                'id' => $this->salesTeam->id,
-                'name' => $this->salesTeam->name
-            ],
             'requirements' => $this->requirements,
             'budget' => $this->budget,
             'deadline' => $this->deadline,
