@@ -117,20 +117,23 @@ class UserController extends Controller
             return ApiResponse::error('Validation Error', $e->errors(), 422);
         }
 
-        $user->update($request->only(['name', 'email','role_id', 'phone', 'address', 'team_id','emergency_phone_num']));
+        $user->update($request->only(['name', 'email', 'role_id', 'phone_num', 'address', 'team_id', 'emergency_phone_num']));
+        $user->refresh(); // Ensure new values are reflected
 
         if ($request->hasFile('profile_pic')) {
             $file = $request->file('profile_pic');
             $filename = time() . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/profile_pics', $filename);
             $user->profile_pic = $filename;
+            $user->save(); // Explicitly save the changes
         }
 
         if ($request->has('roles')) {
-            $user->role()->sync($request->roles);
+            $user->roles()->sync($request->roles);
         }
 
-        return ApiResponse::success('User updated successfully', new UserResource($user));
+        return ApiResponse::success('User updated successfully', new UserResource($user->fresh()));
     }
+
 
 }
