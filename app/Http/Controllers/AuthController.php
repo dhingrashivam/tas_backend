@@ -21,7 +21,7 @@ class AuthController extends Controller
             return ApiResponse::error('Unauthorized', [], 401);
         }
 
-        $user = auth()->user()->load('roles');
+        $user = auth()->user()->load('role');
 
         return ApiResponse::success('Login successful', [
             'token' => $token,
