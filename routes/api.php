@@ -40,5 +40,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/projects', [ProjectController::class, 'store']);
     Route::put('/projects/{id}', [ProjectController::class, 'update']);
     Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+    Route::post('/assign-project-manager', [ProjectController::class, 'assignProjectToManager']);
+    Route::get('/assigned-projects', [ProjectController::class, 'getAssignedProjects']);
+    Route::post('/assign-project-employee', [ProjectController::class, 'assignProjectToEmployee']);
+    Route::get('/user-projects', [ProjectController::class, 'getUserProjects']);
 
 });

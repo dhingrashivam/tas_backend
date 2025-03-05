@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\User;
 use App\Http\Helpers\ApiResponse;
 use App\Http\Resources\ProjectResource;
 
@@ -28,6 +29,73 @@ class ProjectController extends Controller
         $project = Project::create($validatedData);
         return ApiResponse::success('Project created successfully', $project, 201);
     }
+
+    public function assignProjectToManager(Request $request)
+    {
+        $validatedData = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'project_manager_id' => 'required|exists:users,id',
+        ]);
+
+        // $projectManager = User::where('id', $request->project_manager_id)->where('role_id', 5)->first();
+        $projectManager = User::where('id', $request->project_manager_id)->first();
+
+        if (!$projectManager) {
+            return ApiResponse::error('Invalid Project Manager ID', [], 400);
+        }
+
+        $project = Project::findOrFail($request->project_id);
+        $project->project_manager_id = $request->project_manager_id;
+        $project->assigned_by = auth()->user()->id;
+        $project->save();
+
+        return ApiResponse::success('Project assigned to Project Manager successfully', $project->load('projectManager'));
+    }
+
+    public function assignProjectToEmployee(Request $request)
+    {
+        $validatedData = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'employee_ids' => 'required|array',
+            'employee_ids.*' => 'exists:users,id'
+        ]);
+
+        $project = Project::findOrFail($request->project_id);
+
+        // Check if the authenticated user is the Project Manager of this project
+        if (auth()->user()->id !== $project->project_manager_id) {
+            return ApiResponse::error('You are not authorized to assign employees to this project', [], 403);
+        }
+
+        $project->assignedEmployees()->sync($request->employee_ids);
+
+        return ApiResponse::success('Project assigned to Employees successfully', $project->load('assignedEmployees'));
+    }
+
+    public function getUserProjects()
+    {
+        $user = auth()->user();
+        $projects = $user->assignedProjects()->with('client')->get();
+
+        return ApiResponse::success('User projects fetched successfully', $projects);
+    }
+
+
+
+    public function getAssignedProjects()
+    {
+        $user = auth()->user();
+
+        // if ($user->role_id != 5) {
+        //     return ApiResponse::error('Only Project Managers can view assigned projects', [], 403);
+        // }
+
+        $projects = Project::where('project_manager_id', $user->id)->with('client', 'assignedBy')->get();
+
+        return ApiResponse::success('Projects fetched successfully', $projects);
+    }
+
+
 
     public function update(Request $request, $id)
     {
