@@ -109,7 +109,7 @@ class UserController extends Controller
                 'emergency_phone_num' => 'nullable|string|max:15',
                 'address' => 'nullable|string',
                 'team_id' => 'nullable|exists:teams,id',
-                'role_id' => 'nullable|array',
+                'role_id' => 'nullable',
                 'role_id.*' => 'exists:roles,id',
                 'profile_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
@@ -117,7 +117,7 @@ class UserController extends Controller
             return ApiResponse::error('Validation Error', $e->errors(), 422);
         }
 
-        $user->update($request->only(['name', 'email','role_id', 'phone', 'address', 'team_id','pm_id','emergency_phone_num']));
+        $user->update($request->only(['name', 'email','role_id', 'phone', 'address', 'team_id','emergency_phone_num']));
 
         if ($request->hasFile('profile_pic')) {
             $file = $request->file('profile_pic');
