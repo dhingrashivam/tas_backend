@@ -15,11 +15,14 @@ use App\Http\Controllers\ProjectController;
 // })->middleware('auth:sanctum');
 
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::get('/login', function () {
+    return response()->json(['message' => 'Please log in to access this resource.'], 401);
+})->name('login');
 Route::middleware('auth:api')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::post('/users', [UserController::class, 'store']);
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/projectManager', [UserController::class, 'projectManger']);
     Route::get('/users/{id}', [UserController::class, 'show']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
 

@@ -64,6 +64,12 @@ class UserController extends Controller
         return ApiResponse::success('Users fetched successfully', UserResource::collection($users));
     }
 
+    public function projectManger()
+    {
+        $users = User::where('role_id',5)->get();
+        return ApiResponse::success('Project Manger fetched successfully', UserResource::collection($users));
+    }
+
     public function show($id)
     {
         $user = User::with(['team', 'role'])->find($id);
